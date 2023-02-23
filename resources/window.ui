@@ -3,7 +3,11 @@
     <template class="EddyWindow" parent="GtkApplicationWindow">
         <property name="title">Eddy</property>
         <child>
-            <object class="EddyEditor" id="editor">
+            <object class="GtkScrolledWindow">
+                <child>
+                    <object class="EddyEditor" id="editor">
+                    </object>
+                </child>
             </object>
         </child>
     </template>

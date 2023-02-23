@@ -1,5 +1,21 @@
-use glib::Object;
-use gtk::{gio, glib, Application};
+
+use crate::Window;
+use gio::SimpleAction;
+use glib::{clone, Object};
+use gtk::prelude::*;
+use gtk::subclass::prelude::*;
+use gtk::{
+    gio,
+    glib,
+
+    Application,
+    FileChooserAction,
+    FileChooserDialog,
+    ResponseType,
+    TextBuffer,
+};
+
+use std::rc::Rc;
 
 mod imp {
     use gtk::subclass::prelude::*;
@@ -28,12 +44,16 @@ mod imp {
 
 glib::wrapper! {
     pub struct Editor(ObjectSubclass<imp::Editor>)
-        @extends gtk::ApplicationWindow, gtk::Window, gtk::Widget,
-        @implements gio::ActionGroup, gio::ActionMap, gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget, gtk::Native, gtk::Root, gtk::ShortcutManager;
+        @extends gtk::Window, gtk::TextView, gtk::Widget;
 }
 
 impl Editor {
     pub fn new(app: &Application) -> Self {
         Object::builder().property("application", app).build()
+    }
+
+    pub fn write_to(&self, contents: &str) {
+        let buffer = self.buffer();
+        buffer.set_text(contents);
     }
 }
