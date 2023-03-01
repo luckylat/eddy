@@ -16,7 +16,8 @@ use gtk::{
 
 use std::io::{
     BufReader,
-    Read
+    Read,
+    Write,
 };
 use std::fs::File;
 
@@ -96,11 +97,12 @@ impl Window {
         self.add_action(&action_save);
     }
     
-    //editor.rs
+    //TODO Move to editor.rs
     fn open(&self) {
         let editor = self.imp().editor.get();
         // Open FileDialog
         // Deprecated since v4_10
+        //TODO: show unsave dialog if current file is not saved.
         let open_dialog = FileChooserDialog::builder()
             .action(FileChooserAction::Open)
             .title("Open")
@@ -130,13 +132,14 @@ impl Window {
         open_dialog.show();
     }
     
+    //TODO: Move to editor.rs
     fn save(&self) {
         let editor = self.imp().editor.get();
         let buffer = editor.buffer();
         let (start, end) = buffer.bounds();
-        let text = buffer.text(&start, &end, true);
+        let text = buffer.text(&start, &end, true).into_bytes_with_nul();
 
-        println!("{}", text);
+        println!("{:?}", &text);
 
         // Open FileDialog
         // Deprecated since v4_10
@@ -146,6 +149,17 @@ impl Window {
             .transient_for(self)
             .modal(true)
             .build();
+        save_dialog.add_button("_Cancel", ResponseType::Cancel);
+        save_dialog.add_button("_Save", ResponseType::Accept);
+
+        save_dialog.connect_response(move |dialog: &FileChooserDialog, response: ResponseType| {
+            if response == ResponseType::Accept {
+                let mut file = File::create(dialog.file().unwrap().path().unwrap()).unwrap();
+                file.write_all(&text).unwrap();
+                file.flush().unwrap();
+                dialog.destroy();
+            }
+        });
         save_dialog.show();
     }
 }
