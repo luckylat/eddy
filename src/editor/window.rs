@@ -21,11 +21,7 @@ use std::io::{
 };
 use std::fs::File;
 
-use crate::{
-    editor::{
-        editor::Editor,
-    }
-};
+use crate::editor::editor::Editor;
 
 mod imp {
     use glib::subclass::InitializingObject;
