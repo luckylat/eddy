@@ -35,6 +35,7 @@ mod imp {
     pub struct Window {
         #[template_child]
         pub editor: TemplateChild<Editor>,
+
     }
 
     #[glib::object_subclass]
@@ -120,7 +121,9 @@ impl Window {
 
                 editor.write_to(&contents);
 
-                dialog.close();
+                dialog.destroy();
+            } else if response == ResponseType::Cancel {
+                dialog.destroy();
             }
         });
 
@@ -150,6 +153,8 @@ impl Window {
                 let mut file = File::create(dialog.file().unwrap().path().unwrap()).unwrap();
                 file.write_all(&text).unwrap();
                 file.flush().unwrap();
+                dialog.destroy();
+            } else if response == ResponseType::Cancel {
                 dialog.destroy();
             }
         });
