@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
     <template class="EddyWindow" parent="GtkApplicationWindow">
+        <property name="default-height">480</property>
+        <property name="default-width">720</property>
+        <property name="maximized">true</property>
         <property name="title">Eddy</property>
         <child>
             <object class="GtkScrolledWindow">
