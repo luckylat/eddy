@@ -29,7 +29,6 @@ use crate::{
 
 mod imp {
     use glib::subclass::InitializingObject;
-    use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate};
     
@@ -121,7 +120,7 @@ impl Window {
 
                 let mut reader = BufReader::new(file);
                 let mut contents = String::new();
-                reader.read_to_string(&mut contents);
+                reader.read_to_string(&mut contents).unwrap();
 
                 editor.write_to(&contents);
 
