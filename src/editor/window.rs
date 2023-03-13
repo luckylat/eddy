@@ -21,15 +21,10 @@ use std::io::{
 };
 use std::fs::File;
 
-use crate::{
-    editor::{
-        editor::Editor,
-    }
-};
+use crate::editor::editor::Editor;
 
 mod imp {
     use glib::subclass::InitializingObject;
-    use gtk::prelude::*;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate};
     
@@ -121,7 +116,7 @@ impl Window {
 
                 let mut reader = BufReader::new(file);
                 let mut contents = String::new();
-                reader.read_to_string(&mut contents);
+                reader.read_to_string(&mut contents).unwrap();
 
                 editor.write_to(&contents);
 
@@ -138,8 +133,6 @@ impl Window {
         let buffer = editor.buffer();
         let (start, end) = buffer.bounds();
         let text = buffer.text(&start, &end, true).into_bytes_with_nul();
-
-        println!("{:?}", &text);
 
         // Open FileDialog
         // Deprecated since v4_10

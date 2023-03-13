@@ -1,25 +1,14 @@
 
-use crate::Window;
-use gio::SimpleAction;
-use glib::{clone, Object};
+use glib::Object;
 use gtk::prelude::*;
-use gtk::subclass::prelude::*;
 use gtk::{
-    gio,
     glib,
-
     Application,
-    FileChooserAction,
-    FileChooserDialog,
-    ResponseType,
-    TextBuffer,
 };
-
-use std::rc::Rc;
 
 mod imp {
     use gtk::subclass::prelude::*;
-    use gtk::{glib};
+    use gtk::glib;
 
     #[derive(Default)]
     pub struct Editor;
