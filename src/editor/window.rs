@@ -134,8 +134,6 @@ impl Window {
         let (start, end) = buffer.bounds();
         let text = buffer.text(&start, &end, true).into_bytes_with_nul();
 
-        println!("{:?}", &text);
-
         // Open FileDialog
         // Deprecated since v4_10
         let save_dialog = FileChooserDialog::builder()
