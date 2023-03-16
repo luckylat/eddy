@@ -82,7 +82,7 @@ impl Window {
     pub fn new(app: &Application) -> Self {
         Object::builder().property("application", app).build()
     }
-    
+
     pub fn setup_actions(&self) {
         let action_open = SimpleAction::new("open", None);
         action_open.connect_activate(clone!(@weak self as app => move |_, _| {
@@ -101,12 +101,6 @@ impl Window {
             app.save(true);
         }));
         self.add_action(&action_save_as);
-
-        let action_debug = SimpleAction::new("debug", None);
-        action_debug.connect_activate(clone!(@weak self as app => move |_, _| {
-            app.debug();
-        }));
-        self.add_action(&action_debug);
     }
     
     //TODO Move to editor.rs
@@ -194,10 +188,5 @@ impl Window {
 
     fn set_file(&self, file: Option<gio::File>) {
         self.imp().file.set(file);
-    }
-
-    fn debug(&self) {
-        let file = &self.imp().file;
-        println!("current status: {:?}", file);
     }
 }
