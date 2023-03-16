@@ -1,4 +1,4 @@
-use glib::{Object, clone};
+use glib::{Object, PropertySet, clone};
 use gio::{
     SimpleAction
 };
@@ -21,12 +21,15 @@ use std::io::{
 };
 use std::fs::File;
 
+
 use crate::editor::editor::Editor;
 
 mod imp {
     use glib::subclass::InitializingObject;
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate};
+
+    use std::cell::{Cell, RefCell};
     
     use super::*;
 
@@ -36,6 +39,7 @@ mod imp {
         #[template_child]
         pub editor: TemplateChild<Editor>,
 
+        pub file: RefCell<Option<gio::File>>,
     }
 
     #[glib::object_subclass]
@@ -88,9 +92,21 @@ impl Window {
 
         let action_save = SimpleAction::new("save", None);
         action_save.connect_activate(clone!(@weak self as app => move |_, _| {
-            app.save();
+            app.save(false);
         }));
         self.add_action(&action_save);
+
+        let action_save_as = SimpleAction::new("save_as", None);
+        action_save_as.connect_activate(clone!(@weak self as app => move |_, _| {
+            app.save(true);
+        }));
+        self.add_action(&action_save_as);
+
+        let action_debug = SimpleAction::new("debug", None);
+        action_debug.connect_activate(clone!(@weak self as app => move |_, _| {
+            app.debug();
+        }));
+        self.add_action(&action_debug);
     }
     
     //TODO Move to editor.rs
@@ -129,35 +145,59 @@ impl Window {
 
         open_dialog.show();
     }
-    
+
     //TODO: Move to editor.rs
-    fn save(&self) {
+    fn save(&self, is_as: bool) {
+        let file = self.imp().file.borrow().clone();
+        let mut need_save_as = is_as;
+        if file == None {
+            need_save_as = true;
+        }
+
         let editor = self.imp().editor.get();
         let buffer = editor.buffer();
         let (start, end) = buffer.bounds();
         let text = buffer.text(&start, &end, true).into_bytes_with_nul();
 
-        // Open FileDialog
-        // Deprecated since v4_10
-        let save_dialog = FileChooserDialog::builder()
-            .action(FileChooserAction::Save)
-            .title("Save")
-            .transient_for(self)
-            .modal(true)
-            .build();
-        save_dialog.add_button("_Cancel", ResponseType::Cancel);
-        save_dialog.add_button("_Save", ResponseType::Accept);
+        if need_save_as {
+            // Open FileDialog
+            // Deprecated since v4_10
+            let save_dialog = FileChooserDialog::builder()
+                .action(FileChooserAction::Save)
+                .title("Save")
+                .transient_for(self)
+                .modal(true)
+                .build();
+            save_dialog.add_button("_Cancel", ResponseType::Cancel);
+            save_dialog.add_button("_Save", ResponseType::Accept);
 
-        save_dialog.connect_response(move |dialog: &FileChooserDialog, response: ResponseType| {
-            if response == ResponseType::Accept {
-                let mut file = File::create(dialog.file().unwrap().path().unwrap()).unwrap();
-                file.write_all(&text).unwrap();
-                file.flush().unwrap();
-                dialog.destroy();
-            } else if response == ResponseType::Cancel {
-                dialog.destroy();
-            }
-        });
-        save_dialog.show();
+            save_dialog.connect_response(clone!(@weak self as window => move |dialog: &FileChooserDialog, response: ResponseType| {
+                if response == ResponseType::Accept {
+                    let file_core = dialog.file().unwrap();
+                    window.set_file(Some(file_core.clone()));
+                    window.set_title(Some(format!("{} - Eddy", file_core.path().unwrap().to_str().unwrap()).as_str()));
+                    let mut file = File::create(dialog.file().unwrap().path().unwrap()).unwrap();
+                    file.write_all(&text).unwrap();
+                    file.flush().unwrap();
+                    dialog.destroy();
+                } else if response == ResponseType::Cancel {
+                    dialog.destroy();
+                }
+            }));
+            save_dialog.show();
+        } else {
+            let mut file = File::create(file.unwrap().path().unwrap()).unwrap();
+            file.write_all(&text).unwrap();
+            file.flush().unwrap();
+        }
+    }
+
+    fn set_file(&self, file: Option<gio::File>) {
+        self.imp().file.set(file);
+    }
+
+    fn debug(&self) {
+        let file = &self.imp().file;
+        println!("current status: {:?}", file);
     }
 }

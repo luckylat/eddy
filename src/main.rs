@@ -24,6 +24,8 @@ fn main(){
 fn setup_shortcuts(app: &Application) {
     app.set_accels_for_action("win.open", &["<Ctrl>o"]);
     app.set_accels_for_action("win.save", &["<Ctrl>s"]);
+    app.set_accels_for_action("win.save_as", &["<Ctrl><Shift>s"]);
+    app.set_accels_for_action("win.debug", &["<Ctrl>p"]);
 }
 
 fn build_ui(app: &Application) {
