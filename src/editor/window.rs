@@ -118,11 +118,13 @@ impl Window {
         open_dialog.add_button("_Cancel", ResponseType::Cancel);
         open_dialog.add_button("_Open", ResponseType::Accept);
 
-        open_dialog.connect_response(move |dialog: &FileChooserDialog, response: ResponseType| {
+        open_dialog.connect_response(clone!(@weak self as window => move |dialog: &FileChooserDialog, response: ResponseType| {
             if response == ResponseType::Accept {
-                let file = dialog.file().expect("Couldn't get file");
+                let file_core = dialog.file().expect("Couldn't get file");
+                window.set_file(Some(file_core.clone()));
+                window.set_title(Some(format!("{} - Eddy", file_core.clone().path().unwrap().to_str().unwrap()).as_str()));
 
-                let filename = file.path().expect("Couldn't get path");
+                let filename = file_core.path().expect("Couldn't get path");
                 let file = File::open(filename).expect("Couldn't oepn file");
 
                 let mut reader = BufReader::new(file);
@@ -135,7 +137,7 @@ impl Window {
             } else if response == ResponseType::Cancel {
                 dialog.destroy();
             }
-        });
+        }));
 
         open_dialog.show();
     }
