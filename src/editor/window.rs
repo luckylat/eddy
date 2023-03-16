@@ -29,7 +29,7 @@ mod imp {
     use gtk::subclass::prelude::*;
     use gtk::{glib, CompositeTemplate};
 
-    use std::cell::{Cell, RefCell};
+    use std::cell::RefCell;
     
     use super::*;
 
