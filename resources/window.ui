@@ -7,6 +7,10 @@
         <property name="title">Eddy</property>
         <child>
             <object class="GtkScrolledWindow">
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
                 <child>
                     <object class="EddyEditor" id="editor">
                     </object>
