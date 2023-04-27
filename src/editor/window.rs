@@ -1,26 +1,11 @@
-use glib::{Object, PropertySet, clone};
-use gio::{
-    SimpleAction
-};
+use gio::SimpleAction;
+use glib::{clone, Object, PropertySet};
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use gtk::{
-    gio,
-    glib,
+use gtk::{gio, glib, Application, FileChooserAction, FileChooserDialog, ResponseType};
 
-    Application,
-    FileChooserAction,
-    FileChooserDialog,
-    ResponseType,
-};
-
-use std::io::{
-    BufReader,
-    Read,
-    Write,
-};
 use std::fs::File;
-
+use std::io::{BufReader, Read, Write};
 
 use crate::editor::editor::Editor;
 
@@ -30,11 +15,11 @@ mod imp {
     use gtk::{glib, CompositeTemplate};
 
     use std::cell::RefCell;
-    
+
     use super::*;
 
     #[derive(CompositeTemplate, Default)]
-    #[template(resource="/com/cleyl/eddy/window.ui")]
+    #[template(resource = "/com/cleyl/eddy/window.ui")]
     pub struct Window {
         #[template_child]
         pub editor: TemplateChild<Editor>,
@@ -102,7 +87,7 @@ impl Window {
         }));
         self.add_action(&action_save_as);
     }
-    
+
     //TODO Move to editor.rs
     fn open(&self) {
         let editor = self.imp().editor.get();

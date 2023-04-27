@@ -1,14 +1,10 @@
-
 use glib::Object;
 use gtk::prelude::*;
-use gtk::{
-    glib,
-    Application,
-};
+use gtk::{glib, Application};
 
 mod imp {
-    use gtk::subclass::prelude::*;
     use gtk::glib;
+    use gtk::subclass::prelude::*;
 
     #[derive(Default)]
     pub struct Editor;
