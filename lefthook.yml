@@ -2,4 +2,4 @@ pre-commit:
 #   parallel: true
   commands:
     fmt:
-      run: cargo fmt --all
+      run: cargo fmt --all -- --check
