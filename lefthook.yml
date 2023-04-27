@@ -2,4 +2,4 @@ pre-commit:
 #   parallel: true
   commands:
     fmt:
-      run: cargo fmt --all -- --check
+      run: cargo fmt && git add {staged_files}
