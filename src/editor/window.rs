@@ -1,5 +1,5 @@
 use gio::SimpleAction;
-use glib::{clone, Object, PropertySet};
+use glib::{clone, property::PropertySet, Object};
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 use gtk::{gio, glib, Application, FileChooserAction, FileChooserDialog, ResponseType};
