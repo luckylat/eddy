@@ -7,7 +7,7 @@ use gtk::{gio, glib, Application, FileChooserAction, FileChooserDialog, Response
 use std::fs::File;
 use std::io::{BufReader, Read, Write};
 
-use crate::editor::editor::Editor;
+use crate::editor::Editor;
 
 mod imp {
     use glib::subclass::InitializingObject;

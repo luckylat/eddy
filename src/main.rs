@@ -1,9 +1,10 @@
 mod editor;
+mod window;
 
 use gtk::prelude::*;
 use gtk::{gio, Application};
 
-use editor::Window;
+use crate::window::Window;
 
 const APP_ID: &str = "com.cleyl.eddy";
 
