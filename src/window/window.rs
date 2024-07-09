@@ -2,7 +2,7 @@ use gio::SimpleAction;
 use glib::{clone, property::PropertySet, Object};
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use gtk::{gio, glib, Application, FileChooserAction, FileChooserDialog, ResponseType};
+use gtk::{gio, glib, Application, FileDialog};
 
 use std::fs::File;
 use std::io::{BufReader, Read, Write};
@@ -91,40 +91,27 @@ impl Window {
     //TODO Move to editor.rs
     fn open(&self) {
         let editor = self.imp().editor.get();
-        // Open FileDialog
-        // Deprecated since v4_10
         //TODO: show unsave dialog if current file is not saved.
-        let open_dialog = FileChooserDialog::builder()
-            .action(FileChooserAction::Open)
+        let open_dialog = FileDialog::builder()
+            .accept_label("Open")
             .title("Open")
-            .transient_for(self)
             .modal(true)
             .build();
-        open_dialog.add_button("_Cancel", ResponseType::Cancel);
-        open_dialog.add_button("_Open", ResponseType::Accept);
 
-        open_dialog.connect_response(clone!(@weak self as window => move |dialog: &FileChooserDialog, response: ResponseType| {
-            if response == ResponseType::Accept {
-                let file_core = dialog.file().expect("Couldn't get file");
-                window.set_file(Some(file_core.clone()));
-                window.set_title(Some(format!("{} - Eddy", file_core.clone().path().unwrap().to_str().unwrap()).as_str()));
+        open_dialog.open(Some(self), gio::Cancellable::NONE, move |file| {
+            let file_core = file.unwrap();
+            //set_title
+            //self.set_file(Some(file_core.clone()));
+            //self.set_title(Some(format!("{} - Eddy", file_core.clone().path().unwrap().to_str().unwrap()).as_str()));
+            let filename = file_core.path().expect("Couldn't get path");
+            let file = File::open(filename).expect("Couldn't open file");
 
-                let filename = file_core.path().expect("Couldn't get path");
-                let file = File::open(filename).expect("Couldn't oepn file");
+            let mut reader = BufReader::new(file);
+            let mut contents = String::new();
+            reader.read_to_string(&mut contents).unwrap();
 
-                let mut reader = BufReader::new(file);
-                let mut contents = String::new();
-                reader.read_to_string(&mut contents).unwrap();
-
-                editor.write_to(&contents);
-
-                dialog.destroy();
-            } else if response == ResponseType::Cancel {
-                dialog.destroy();
-            }
-        }));
-
-        open_dialog.show();
+            editor.write_to(&contents);
+        });
     }
 
     //TODO: Move to editor.rs
@@ -143,29 +130,23 @@ impl Window {
         if need_save_as {
             // Open FileDialog
             // Deprecated since v4_10
-            let save_dialog = FileChooserDialog::builder()
-                .action(FileChooserAction::Save)
+            let save_dialog = FileDialog::builder()
+                .accept_label("Save")
                 .title("Save")
-                .transient_for(self)
                 .modal(true)
                 .build();
-            save_dialog.add_button("_Cancel", ResponseType::Cancel);
-            save_dialog.add_button("_Save", ResponseType::Accept);
 
-            save_dialog.connect_response(clone!(@weak self as window => move |dialog: &FileChooserDialog, response: ResponseType| {
-                if response == ResponseType::Accept {
-                    let file_core = dialog.file().unwrap();
-                    window.set_file(Some(file_core.clone()));
-                    window.set_title(Some(format!("{} - Eddy", file_core.path().unwrap().to_str().unwrap()).as_str()));
-                    let mut file = File::create(dialog.file().unwrap().path().unwrap()).unwrap();
-                    file.write_all(&text).unwrap();
-                    file.flush().unwrap();
-                    dialog.destroy();
-                } else if response == ResponseType::Cancel {
-                    dialog.destroy();
-                }
-            }));
-            save_dialog.show();
+            save_dialog.open(Some(self), gio::Cancellable::NONE, move |file| {
+                let file_core = file.unwrap();
+
+                //self.set_file(Some(file_core.clone()));
+                //self.set_title(Some(format!("{} - Eddy", file_core.path().unwrap().to_str().unwrap()).as_str()));
+
+                //let mut file = File::create(file_core.path().unwrap()).unwrap();
+
+                //file.write_all(&text).unwrap();
+                //file.flush().unwrap();
+            });
         } else {
             let mut file = File::create(file.unwrap().path().unwrap()).unwrap();
             file.write_all(&text).unwrap();
